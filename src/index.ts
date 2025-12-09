@@ -163,7 +163,7 @@ basekit.addField({
       const inputStr = input[0]
       return {
         code: FieldCode.Success,
-        data: inputStr,
+        data: 'inputStr',
       }
 
       /*
