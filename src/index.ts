@@ -34,13 +34,10 @@ basekit.addField({
       label: '输入信息',
       component: FieldComponent.FieldSelect,
       props:{
+        
         mode: 'multiple',
-        supportType: [
-          FieldType.Text,
-          FieldType.Number,
-          FieldType.DateTime,
-          FieldType.Attachment,
-        ],
+        supportType: FieldType.Text,
+        
       },
       validator:{
         required: true,
@@ -58,12 +55,14 @@ basekit.addField({
       },
       validator: {
         required:false
+        
       }
     },
   ],
   // 定义捷径的返回结果类型
   resultType: {
-   type: FieldType.Text,
+    type: FieldType.Text,
+    
   },
   // formItemParams 为运行时传入的字段参数，对应字段配置里的 formItems （如引用的依赖字段）
   execute: async (formItemParams/*: { account: number }*/, context) => {
@@ -99,7 +98,7 @@ basekit.addField({
         const res = await context.fetch(url, init, authId);
         // 不要直接.json()，因为接口返回的可能不是json格式，会导致解析错误
         const resText = await res.text();
-
+        console.log('====resText', input);
         // 自动记录请求结果日志
         debugLog({
           [`===fetch res： ${url} 接口返回结果`]: {
@@ -164,7 +163,7 @@ basekit.addField({
       const inputStr = input[0]
       return {
         code: FieldCode.Success,
-        data: inputStr,
+        data: input.toString(),
       }
 
       /*
