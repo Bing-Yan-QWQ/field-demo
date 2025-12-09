@@ -1,13 +1,14 @@
-import { basekit, FieldType, field, FieldComponent, FieldCode, NumberFormatter, AuthorizationType } from '@lark-opdev/block-basekit-server-api';
+import { basekit, FieldType, field, FieldComponent, FieldCode, NumberFormatter, AuthorizationType, uploadAttachments } from '@lark-opdev/block-basekit-server-api';
 const { t } = field;
 
 const feishuDm = ['feishu.cn', 'feishucdn.com', 'larksuitecdn.com', 'larksuite.com'];
 // 通过addDomainList添加请求接口的域名，不可写多个addDomainList，否则会被覆盖
-basekit.addDomainList([...feishuDm, 'api.exchangerate-api.com',]);
+basekit.addDomainList([...feishuDm, 'api.exchangerate-api.com','ai-box.xyb2b.com']);
+const XY_OSS = "https://ai-box.xyb2b.com/ai-plugin-box/execute/oss-opt"
 
 basekit.addField({
   // 定义捷径的i18n语言资源
-  i18n: {
+  /*i18n: {
     messages: {
       'zh-CN': {
         'rmb': '人民币金额',
@@ -25,59 +26,49 @@ basekit.addField({
         'rate': '為替レート',
       },
     }
-  },
+  },*/
   // 定义捷径的入参
   formItems: [
     {
-      key: 'account',
-      label: t('rmb'),
+      key: 'input',
+      label: '输入信息',
       component: FieldComponent.FieldSelect,
+      props:{
+        mode: 'multiple',
+        supportType: [
+          FieldType.Text,
+          FieldType.Number,
+          FieldType.DateTime,
+          FieldType.Attachment,
+        ],
+      },
+      validator:{
+        required: true,
+      },
+    },
+    {
+      key: 'PDF',
+      label: 'PDF表格',
+      component:FieldComponent.FieldSelect,
       props: {
-        supportType: [FieldType.Number],
+        mode: 'single',
+        supportType: [
+          FieldType.Attachment
+        ],
       },
       validator: {
-        required: true,
+        required:false
       }
     },
   ],
   // 定义捷径的返回结果类型
   resultType: {
-    type: FieldType.Object,
-    extra: {
-      icon: {
-        light: 'https://lf3-static.bytednsdoc.com/obj/eden-cn/eqgeh7upeubqnulog/chatbot.svg',
-      },
-      properties: [
-        {
-          key: 'id',
-          isGroupByKey: true,
-          type: FieldType.Text,
-          label: 'id',
-          hidden: true,
-        },
-        {
-          key: 'usd',
-          type: FieldType.Number,
-          label: t('usd'),
-          primary: true,
-          extra: {
-            formatter: NumberFormatter.DIGITAL_ROUNDED_2,
-          }
-        },
-        {
-          key: 'rate',
-          type: FieldType.Number,
-          label: t('rate'),
-          extra: {
-            formatter: NumberFormatter.DIGITAL_ROUNDED_4,
-          }
-        },
-      ],
-    },
+   type: FieldType.Text,
   },
   // formItemParams 为运行时传入的字段参数，对应字段配置里的 formItems （如引用的依赖字段）
-  execute: async (formItemParams: { account: number }, context) => {
-    const { account = 0 } = formItemParams;
+  execute: async (formItemParams/*: { account: number }*/, context) => {
+    //const { account = 0 } = formItemParams;
+    const { input = [], PDF } = formItemParams;
     /** 
          * 为方便查看日志，使用此方法替代console.log
          * 开发者可以直接使用这个工具函数进行日志记录
@@ -138,27 +129,42 @@ basekit.addField({
     };
 
     try {
-
+      /*
       interface ExchangeRateResponse {
         rates: {
           [currency: string]: number
         }
       }
-
+      /*
       const res = await fetch<ExchangeRateResponse>('https://api.exchangerate-api.com/v4/latest/CNY2', { // 已经在addDomainList中添加为白名单的请求
         method: 'GET',
       });
 
-      const usdRate = res?.rates?.['USD'];
+      const usdRate = res?.rates?.['USD'];*/
+      /*
+      const oss_res = await fetch<any>(XY_OSS, {
+        method: 'POST',
+        headers: {
+          'authorization': 'ZHExG7au)qmUv^nKJ8#ob3f2KgJYA)i+',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          "operation":"PUT",
+          "ossPath": "pdf_to_markdown",
+          "expireMinute": -1,
+          "attachmentDisposition": false,
+          "file": "${PDF}"
+        })
+      });
 
+      const oss_path = oss_res?.data?.url;
+*/
+      
 
+      const inputStr = input.toString();
       return {
         code: FieldCode.Success,
-        data: {
-          id: `${Math.random()}`,
-          usd: parseFloat((account * usdRate).toFixed(4)),
-          rate: usdRate,
-        }
+        data: inputStr,
       }
 
       /*
